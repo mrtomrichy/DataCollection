@@ -18,7 +18,8 @@ import co.uk.rushorm.core.exceptions.RushSqlException;
 
 /**
  * Created by tom on 18/11/2015.
- */public class AndroidRushStatementRunnerSQLCipher extends SQLiteOpenHelper implements RushStatementRunner {
+ */
+public class AndroidRushStatementRunnerSQLCipher extends SQLiteOpenHelper implements RushStatementRunner {
 
   private int lastRunVersion = -1;
   private RushConfig rushConfig;
