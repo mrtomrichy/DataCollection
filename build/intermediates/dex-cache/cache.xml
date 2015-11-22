@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="/Users/tom/.gradle/caches/modules-2/files-2.1/co.uk.rushorm/rushandroid/1.1.11/9390db37368fd9daf4b1308b36dc967d61d0a0c8/rushandroid-1.1.11.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="9390db37368fd9daf4b1308b36dc967d61d0a0c8">
+        <dex dex="/Users/tom/AndroidStudioProjects/DataCollection/app/build/intermediates/pre-dexed/debug/rushandroid-1.1.11-c0c7d5cef79dca38d4d723f991058f39f5a74a6f.jar" />
+    </item>
+
+</items>
