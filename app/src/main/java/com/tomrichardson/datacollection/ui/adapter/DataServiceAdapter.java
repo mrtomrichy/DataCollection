@@ -13,7 +13,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.tomrichardson.datacollection.R;
-import com.tomrichardson.datacollection.model.tracking.TrackingService;
+import com.tomrichardson.datacollection.model.service.DataServiceModel;
 import com.tomrichardson.datacollection.service.ServiceUtils;
 
 import java.util.Arrays;
@@ -22,14 +22,20 @@ import java.util.List;
 /**
  * Created by tom on 22/11/2015.
  */
-public class TrackingListAdapter extends RecyclerView.Adapter<TrackingListAdapter.ViewHolder> {
+public class DataServiceAdapter extends RecyclerView.Adapter<DataServiceAdapter.ViewHolder> {
+
+  public interface RowClickedListener {
+    void rowClicked(DataServiceModel service);
+  }
 
   private Activity activity;
-  private List<TrackingService> services;
+  private List<DataServiceModel> services;
+  private RowClickedListener listener;
 
-  public TrackingListAdapter(Activity activity) {
+  public DataServiceAdapter(Activity activity, RowClickedListener listener) {
     this.activity = activity;
-    this.services = Arrays.asList(ServiceUtils.getSupportedTrackingClasses());
+    this.services = Arrays.asList(ServiceUtils.getSupportedDataServices());
+    this.listener = listener;
   }
 
   public void onPermissionUpdate(boolean success, int callbackNumber) {
@@ -49,7 +55,16 @@ public class TrackingListAdapter extends RecyclerView.Adapter<TrackingListAdapte
 
   @Override
   public void onBindViewHolder(ViewHolder holder, int position) {
-    final TrackingService service = services.get(position);
+    final DataServiceModel service = services.get(position);
+
+    holder.itemView.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        if(listener != null) {
+          listener.rowClicked(service);
+        }
+      }
+    });
 
     holder.name.setText(service.getName());
     holder.toggle.setChecked(service.isServiceRunning(activity));
@@ -70,30 +85,17 @@ public class TrackingListAdapter extends RecyclerView.Adapter<TrackingListAdapte
     return services.size();
   }
 
-  private void stopService(TrackingService service) {
+  private void stopService(DataServiceModel service) {
     service.stopService(activity);
   }
 
-  private void startService(TrackingService service) {
+  private void startService(DataServiceModel service) {
 
     for (String permission : service.getRequiredPermissions()) {
       if (ContextCompat.checkSelfPermission(activity, permission) != PackageManager.PERMISSION_GRANTED) {
-        // Should we show an explanation?
-        if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
-
-          // Show an explanation to the user *asynchronously* -- don't block
-          // this thread waiting for the user's response! After the user
-          // sees the explanation, try again to request the permission.
-
-          ActivityCompat.requestPermissions(activity,
-              new String[]{permission},
-              services.indexOf(service));
-
-        } else {
-          ActivityCompat.requestPermissions(activity,
-              new String[]{permission},
-              services.indexOf(service));
-        }
+        ActivityCompat.requestPermissions(activity,
+            new String[]{permission},
+            services.indexOf(service));
 
         return;
       }
@@ -103,8 +105,8 @@ public class TrackingListAdapter extends RecyclerView.Adapter<TrackingListAdapte
   }
 
   public static class ViewHolder extends RecyclerView.ViewHolder {
-    TextView name;
-    Switch toggle;
+    public TextView name;
+    public Switch toggle;
 
     public ViewHolder(View itemView) {
       super(itemView);

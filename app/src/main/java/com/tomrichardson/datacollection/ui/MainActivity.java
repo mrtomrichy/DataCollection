@@ -1,5 +1,6 @@
 package com.tomrichardson.datacollection.ui;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -8,16 +9,18 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 
 import com.tomrichardson.datacollection.R;
-import com.tomrichardson.datacollection.ui.adapter.TrackingListAdapter;
+import com.tomrichardson.datacollection.model.service.DataServiceModel;
+import com.tomrichardson.datacollection.ui.adapter.DataServiceAdapter;
 
 public class MainActivity extends AppCompatActivity {
 
-  TrackingListAdapter adapter;
+  private DataServiceAdapter adapter;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
+
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
 
@@ -27,7 +30,14 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
     mRecyclerView.setLayoutManager(mLayoutManager);
 
-    adapter = new TrackingListAdapter(this);
+    adapter = new DataServiceAdapter(this, new DataServiceAdapter.RowClickedListener() {
+      @Override
+      public void rowClicked(DataServiceModel service) {
+        Intent i = new Intent(MainActivity.this, DataViewActivity.class);
+        i.putExtra(DataViewActivity.TRACKING_SERVICE_KEY, service);
+        startActivity(i);
+      }
+    });
     mRecyclerView.setAdapter(adapter);
   }
 

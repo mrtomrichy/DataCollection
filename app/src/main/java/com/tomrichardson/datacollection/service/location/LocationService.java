@@ -1,17 +1,11 @@
-package com.tomrichardson.datacollection.service;
+package com.tomrichardson.datacollection.service.location;
 
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.location.Location;
 import android.location.LocationManager;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
-
-import com.tomrichardson.datacollection.model.LocationModel;
-
-import co.uk.rushorm.core.RushCore;
 
 public class LocationService extends Service {
   public LocationService() {
@@ -22,42 +16,7 @@ public class LocationService extends Service {
   private static final int LOCATION_INTERVAL = 10 * 60 * 1000;
   private static final float LOCATION_DISTANCE = 10f;
 
-  private class LocationListener implements android.location.LocationListener {
-    Location mLastLocation;
-
-    public LocationListener(String provider) {
-      Log.e(TAG, "LocationListener " + provider);
-      mLastLocation = new Location(provider);
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-      Log.e(TAG, "onLocationChanged: " + location);
-      mLastLocation.set(location);
-
-      RushCore.getInstance().save(new LocationModel(location.getLatitude(), location.getLongitude(), location.getAccuracy()));
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-      Log.e(TAG, "onProviderDisabled: " + provider);
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-      Log.e(TAG, "onProviderEnabled: " + provider);
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-      Log.e(TAG, "onStatusChanged: " + provider);
-    }
-  }
-
-  LocationListener[] mLocationListeners = new LocationListener[]{
-      new LocationListener(LocationManager.GPS_PROVIDER),
-      new LocationListener(LocationManager.NETWORK_PROVIDER)
-  };
+  LocationListener[] mLocationListeners;
 
   @Override
   public IBinder onBind(Intent arg0) {
@@ -74,6 +33,12 @@ public class LocationService extends Service {
   @Override
   public void onCreate() {
     Log.e(TAG, "onCreate");
+
+    mLocationListeners = new LocationListener[]{
+        new LocationListener(LocationManager.GPS_PROVIDER, getApplicationContext()),
+        new LocationListener(LocationManager.NETWORK_PROVIDER, getApplicationContext())
+    };
+
     initializeLocationManager();
     try {
       mLocationManager.requestLocationUpdates(
@@ -99,12 +64,13 @@ public class LocationService extends Service {
   public void onDestroy() {
     Log.e(TAG, "onDestroy");
     super.onDestroy();
+
     if (mLocationManager != null) {
       for (int i = 0; i < mLocationListeners.length; i++) {
         try {
           mLocationManager.removeUpdates(mLocationListeners[i]);
         } catch (Exception ex) {
-          Log.i(TAG, "fail to remove location listners, ignore", ex);
+          Log.i(TAG, "fail to remove location listeners, ignore", ex);
         }
       }
     }

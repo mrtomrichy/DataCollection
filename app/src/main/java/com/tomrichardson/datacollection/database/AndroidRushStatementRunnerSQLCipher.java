@@ -20,26 +20,37 @@ import co.uk.rushorm.core.exceptions.RushSqlException;
  * Created by tom on 18/11/2015.
  */
 public class AndroidRushStatementRunnerSQLCipher extends SQLiteOpenHelper implements RushStatementRunner {
-
   private int lastRunVersion = -1;
   private RushConfig rushConfig;
   private final Context context;
+
+  private String getEncryptionKey() {
+    return Settings.Secure.getString(context.getContentResolver(),
+        Settings.Secure.ANDROID_ID);
+  }
 
   public AndroidRushStatementRunnerSQLCipher(Context context, String name, RushConfig rushConfig) {
     super(context, name, null, rushConfig.dbVersion());
     lastRunVersion = rushConfig.dbVersion();
     this.rushConfig = rushConfig;
     this.context = context;
-
     SQLiteDatabase.loadLibs(context);
+  }
+
+  private SQLiteDatabase getWritableDatabase() {
+    return getWritableDatabase(getEncryptionKey());
+  }
+
+  private SQLiteDatabase getReadableDatabase() {
+    return getReadableDatabase(getEncryptionKey());
   }
 
   @Override
   public void runRaw(String statement, RushQue que) {
     try {
-      getWritableDatabase(getEncryptionKey()).execSQL(statement);
+      getWritableDatabase().execSQL(statement);
     } catch (SQLiteException exception) {
-      if(rushConfig.inDebug()) {
+      if (rushConfig.inDebug()) {
         throw exception;
       } else {
         throw new RushSqlException();
@@ -51,9 +62,9 @@ public class AndroidRushStatementRunnerSQLCipher extends SQLiteOpenHelper implem
   public ValuesCallback runGet(String sql, RushQue que) {
     final Cursor cursor;
     try {
-      cursor = getWritableDatabase(getEncryptionKey()).rawQuery(sql, null);
+      cursor = getWritableDatabase().rawQuery(sql, null);
     } catch (SQLiteException exception) {
-      if(rushConfig.inDebug()) {
+      if (rushConfig.inDebug()) {
         throw exception;
       } else {
         throw new RushSqlException();
@@ -65,16 +76,17 @@ public class AndroidRushStatementRunnerSQLCipher extends SQLiteOpenHelper implem
       public boolean hasNext() {
         return !cursor.isAfterLast();
       }
+
       @Override
       public List<String> next() {
-
         List<String> row = new ArrayList<>();
-        for(int i = 0; i < cursor.getColumnCount(); i++){
+        for (int i = 0; i < cursor.getColumnCount(); i++) {
           row.add(cursor.getString(i));
         }
         cursor.moveToNext();
         return row;
       }
+
       @Override
       public void close() {
         cursor.close();
@@ -84,20 +96,20 @@ public class AndroidRushStatementRunnerSQLCipher extends SQLiteOpenHelper implem
 
   @Override
   public void startTransition(RushQue que) {
-    getWritableDatabase(getEncryptionKey()).beginTransaction();
+    getWritableDatabase().beginTransaction();
   }
 
   @Override
   public void endTransition(RushQue que) {
-    getWritableDatabase(getEncryptionKey()).setTransactionSuccessful();
-    getWritableDatabase(getEncryptionKey()).endTransaction();
+    getWritableDatabase().setTransactionSuccessful();
+    getWritableDatabase().endTransaction();
   }
 
   @Override
   public boolean isFirstRun() {
     String[] databases = context.databaseList();
     for (String database : databases) {
-      if(database.equals(rushConfig.dbName())) {
+      if (database.equals(rushConfig.dbName())) {
         return false;
       }
     }
@@ -106,7 +118,6 @@ public class AndroidRushStatementRunnerSQLCipher extends SQLiteOpenHelper implem
 
   @Override
   public void initializeComplete(long version) {
-
   }
 
   @Override
@@ -115,20 +126,16 @@ public class AndroidRushStatementRunnerSQLCipher extends SQLiteOpenHelper implem
   }
 
   @Override
-  public void onCreate(SQLiteDatabase db) {}
+  public void onCreate(SQLiteDatabase db) {
+  }
 
   @Override
   public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
     lastRunVersion = oldVersion;
   }
 
-  private int getLastRunVersion(){
-    getReadableDatabase(getEncryptionKey()).getVersion();
+  private int getLastRunVersion() {
+    getReadableDatabase().getVersion();
     return lastRunVersion;
-  }
-
-  private String getEncryptionKey() {
-    return Settings.Secure.getString(context.getContentResolver(),
-        Settings.Secure.ANDROID_ID);
   }
 }

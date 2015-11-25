@@ -5,7 +5,8 @@ import android.app.ActivityManager;
 import android.content.Context;
 
 import com.tomrichardson.datacollection.model.LocationModel;
-import com.tomrichardson.datacollection.model.tracking.TrackingService;
+import com.tomrichardson.datacollection.model.service.DataServiceModel;
+import com.tomrichardson.datacollection.service.location.LocationService;
 
 /**
  * Created by tom on 20/11/2015.
@@ -22,9 +23,12 @@ public class ServiceUtils {
     return false;
   }
 
-  public static TrackingService[] getSupportedTrackingClasses() {
-    return new TrackingService[]{
-        new TrackingService("Location Service", LocationService.class, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, LocationModel.class)
+  public static DataServiceModel[] getSupportedDataServices() {
+
+    return new DataServiceModel[]{
+        new DataServiceModel("Location Service", LocationService.class,
+                            new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
+                            LocationModel.class)
     };
   }
 

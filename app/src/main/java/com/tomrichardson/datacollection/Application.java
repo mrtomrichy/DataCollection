@@ -1,6 +1,5 @@
 package com.tomrichardson.datacollection;
 
-import com.tomrichardson.datacollection.database.AndroidRushStatementRunnerSQLCipher;
 import com.tomrichardson.datacollection.model.LocationModel;
 
 import java.util.ArrayList;
@@ -20,7 +19,8 @@ public class Application extends android.app.Application {
 
     AndroidInitializeConfig config = new AndroidInitializeConfig(getApplicationContext());
 
-    config.setRushStatementRunner(new AndroidRushStatementRunnerSQLCipher(getApplicationContext(), "DataCollection", config.getRushConfig()));
+    // Turn off encryption for now for testing purposes
+    //config.setRushStatementRunner(new AndroidRushStatementRunnerSQLCipher(getApplicationContext(), "DataCollection", config.getRushConfig()));
 
     List<Class<? extends Rush>> classes = new ArrayList<>();
     classes.add(LocationModel.class);
