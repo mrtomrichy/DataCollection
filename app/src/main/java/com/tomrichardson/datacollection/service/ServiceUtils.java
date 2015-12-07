@@ -4,8 +4,10 @@ import android.Manifest;
 import android.app.ActivityManager;
 import android.content.Context;
 
+import com.tomrichardson.datacollection.model.ActivityModel;
 import com.tomrichardson.datacollection.model.LocationModel;
 import com.tomrichardson.datacollection.model.service.DataServiceModel;
+import com.tomrichardson.datacollection.service.activity.ActivityService;
 import com.tomrichardson.datacollection.service.location.LocationService;
 
 /**
@@ -28,7 +30,10 @@ public class ServiceUtils {
     return new DataServiceModel[]{
         new DataServiceModel("Location Service", LocationService.class,
                             new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
-                            LocationModel.class)
+                            LocationModel.class),
+        new DataServiceModel("Activity Service", ActivityService.class,
+                            new String[]{},
+                            ActivityModel.class)
     };
   }
 

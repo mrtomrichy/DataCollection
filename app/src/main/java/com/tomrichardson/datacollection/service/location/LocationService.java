@@ -16,7 +16,7 @@ public class LocationService extends Service {
   private static final int LOCATION_INTERVAL = 10 * 60 * 1000;
   private static final float LOCATION_DISTANCE = 10f;
 
-  LocationListener[] mLocationListeners;
+  private LocationListener[] mLocationListeners;
 
   @Override
   public IBinder onBind(Intent arg0) {

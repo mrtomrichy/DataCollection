@@ -1,5 +1,6 @@
 package com.tomrichardson.datacollection;
 
+import com.tomrichardson.datacollection.model.ActivityModel;
 import com.tomrichardson.datacollection.model.LocationModel;
 
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ public class Application extends android.app.Application {
 
     List<Class<? extends Rush>> classes = new ArrayList<>();
     classes.add(LocationModel.class);
+    classes.add(ActivityModel.class);
     config.setClasses(classes);
     RushCore.initialize(config);
   }
