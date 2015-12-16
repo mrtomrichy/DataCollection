@@ -9,6 +9,7 @@ import com.tomrichardson.datacollection.model.LocationModel;
 import com.tomrichardson.datacollection.model.service.DataServiceModel;
 import com.tomrichardson.datacollection.service.activity.ActivityService;
 import com.tomrichardson.datacollection.service.location.LocationService;
+import com.tomrichardson.datacollection.service.textmessage.TextMessageService;
 
 /**
  * Created by tom on 20/11/2015.
@@ -33,7 +34,10 @@ public class ServiceUtils {
                             LocationModel.class),
         new DataServiceModel("Activity Service", ActivityService.class,
                             new String[]{},
-                            ActivityModel.class)
+                            ActivityModel.class),
+        new DataServiceModel("Text Message Service", TextMessageService.class,
+            new String[]{Manifest.permission.READ_SMS},
+            null)
     };
   }
 

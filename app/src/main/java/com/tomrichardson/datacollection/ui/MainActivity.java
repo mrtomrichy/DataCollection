@@ -33,9 +33,11 @@ public class MainActivity extends AppCompatActivity {
     adapter = new DataServiceAdapter(this, new DataServiceAdapter.RowClickedListener() {
       @Override
       public void rowClicked(DataServiceModel service) {
-        Intent i = new Intent(MainActivity.this, DataViewActivity.class);
-        i.putExtra(DataViewActivity.TRACKING_SERVICE_KEY, service);
-        startActivity(i);
+        if(service.getModelClass() != null){
+          Intent i = new Intent(MainActivity.this, DataViewActivity.class);
+          i.putExtra(DataViewActivity.TRACKING_SERVICE_KEY, service);
+          startActivity(i);
+        }
       }
     });
     mRecyclerView.setAdapter(adapter);
