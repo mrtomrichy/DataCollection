@@ -9,8 +9,10 @@ import com.google.android.gms.location.DetectedActivity;
 import com.tomrichardson.datacollection.model.ActivityModel;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import co.uk.rushorm.core.RushCore;
+import co.uk.rushorm.core.RushSearch;
 
 /**
  * Created by tom on 07/12/2015.
@@ -55,10 +57,30 @@ public class DetectedActivitiesIntentService extends IntentService {
     if (activity != null) {
       RushCore.getInstance().save(new ActivityModel(activity.getType(), System.currentTimeMillis(),
           getActivityString(activity.getType())));
-    }
 
-    Log.d("BROADCAST", ActivityModel.class.toString());
-    this.sendBroadcast(new Intent(ActivityModel.class.toString()));
+      normaliseActivities();
+
+      Log.d("BROADCAST", ActivityModel.class.toString());
+      this.sendBroadcast(new Intent(ActivityModel.class.toString()));
+    }
+  }
+
+  private void normaliseActivities() {
+    List<ActivityModel> results = new RushSearch().orderAsc("time").find(ActivityModel.class);
+
+    if(results.size() >= 2) {
+      ActivityModel secondLast = results.get(results.size() - 2);
+      ActivityModel last = results.get(results.size() - 1);
+
+      if(last.activityType == secondLast.activityType) {
+        // Use the last one as the start of the activity
+        RushCore.getInstance().delete(last);
+      } else if(secondLast.getMinTimeForActivity() > last.time - secondLast.time) {
+        // Assume last one is an outlier
+        RushCore.getInstance().delete(secondLast);
+        normaliseActivities();
+      }
+    }
   }
 
   private static String getActivityString(int detectedActivityType) {

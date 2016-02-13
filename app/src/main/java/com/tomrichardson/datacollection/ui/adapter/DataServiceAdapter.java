@@ -34,7 +34,7 @@ public class DataServiceAdapter extends RecyclerView.Adapter<DataServiceAdapter.
 
   public DataServiceAdapter(Activity activity, RowClickedListener listener) {
     this.activity = activity;
-    this.services = Arrays.asList(ServiceUtils.getSupportedDataServices());
+    this.services = Arrays.asList(ServiceUtils.getSupportedDataServices(activity));
     this.listener = listener;
   }
 
@@ -67,7 +67,7 @@ public class DataServiceAdapter extends RecyclerView.Adapter<DataServiceAdapter.
     });
 
     holder.name.setText(service.getName());
-    holder.toggle.setChecked(service.isServiceRunning(activity));
+    holder.toggle.setChecked(service.isServiceRunning());
     holder.toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
       @Override
       public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

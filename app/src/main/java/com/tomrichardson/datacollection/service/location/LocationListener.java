@@ -38,14 +38,15 @@ public class LocationListener implements android.location.LocationListener {
     mLastLocation.set(location);
 
     Address address = null;
-
     try {
       address = mGeoCoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0);
-
-      Log.d("LOCATION", "Address: " + address.getAddressLine(0));
     } catch (IOException e) {
       e.printStackTrace();
+      return;
     }
+
+    Log.d("LOCATION", "Address: " + address.getAddressLine(0));
+
 
     LocationModel l = new LocationModel(location.getProvider(), location.getLatitude(), location.getLongitude(), location.getAltitude(),
         location.getAccuracy(), Calendar.getInstance().getTime(),
@@ -55,6 +56,7 @@ public class LocationListener implements android.location.LocationListener {
     RushCore.getInstance().save(l);
     Log.d("BROADCAST", LocationModel.class.toString());
     mContext.sendBroadcast(new Intent(LocationModel.class.toString()));
+
   }
 
   @Override

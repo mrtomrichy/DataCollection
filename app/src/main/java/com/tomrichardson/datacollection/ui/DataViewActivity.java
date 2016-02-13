@@ -60,7 +60,7 @@ public class DataViewActivity extends AppCompatActivity {
 
     getSupportActionBar().setTitle(service.getName() + " data");
 
-    models = new RushSearch().find(service.getModelClass());
+    models = new RushSearch().orderAsc("rush_created").find(service.getModelClass());
 
     List<Field> fields = new ArrayList<>();
     ReflectionUtils.getAllFields(fields, service.getModelClass(), true);
@@ -109,6 +109,7 @@ public class DataViewActivity extends AppCompatActivity {
     super.onResume();
 
     registerReceiver(receiver, new IntentFilter(service.getModelClass().toString()));
+    updateItems();
   }
 
   @Override

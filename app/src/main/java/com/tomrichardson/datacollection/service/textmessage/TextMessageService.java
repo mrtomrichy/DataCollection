@@ -2,6 +2,7 @@ package com.tomrichardson.datacollection.service.textmessage;
 
 import android.app.Service;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.IBinder;
@@ -21,63 +22,60 @@ import java.util.List;
  * Created by tom on 14/12/2015.
  */
 public class TextMessageService extends Service {
+
   private static final String TAG = "SMSService";
 
-
-  @Override
-  public void onCreate() {
-    super.onCreate();
-
+  public static void getSentimentAnalysis(Context context) {
     long startTime = System.currentTimeMillis();
 
-    String[] positiveWords = this.getResources().getStringArray(R.array.positive_words);
-    String[] negativeWords = this.getResources().getStringArray(R.array.negative_words);
+    String[] positiveWords = context.getResources().getStringArray(R.array.positive_words);
+    String[] negativeWords = context.getResources().getStringArray(R.array.negative_words);
 
     HashMap<String, Integer> positiveMap = new HashMap<>();
     HashMap<String, Integer> negativeMap = new HashMap<>();
 
-    for(String word : positiveWords) positiveMap.put(word, 0);
-    for(String word : negativeWords) negativeMap.put(word, 0);
+    for (String word : positiveWords) positiveMap.put(word, 0);
+    for (String word : negativeWords) negativeMap.put(word, 0);
 
-    List<SMSModel> sentSMS = getSentMessages();
-    int positive = 0, negative = 0;
+    List<SMSModel> sentSMS = getSentMessages(context);
 
     Log.d(TAG, "SMS count: " + sentSMS.size());
     int totalWordCount = 0;
 
-    for(SMSModel sms : sentSMS) {
+    List<String> positiveMatches = new ArrayList<>();
+    List<String> negativeMatches = new ArrayList<>();
+
+    for (SMSModel sms : sentSMS) {
       String[] words = sms.body.split("\\W+");
       totalWordCount += words.length;
-      for(String s : words) {
-        if(positiveMap.containsKey(s))      positive++;
-        else if(negativeMap.containsKey(s)) negative++;
+      for (String s : words) {
+        if (positiveMap.containsKey(s)) positiveMatches.add(s);
+        else if (negativeMap.containsKey(s)) negativeMatches.add(s);
       }
     }
 
     long timeTaken = System.currentTimeMillis() - startTime;
 
-    Log.d(TAG, "Positive words matched: " + positive + "\nNegative words matched: " + negative
-                + "\nof " + totalWordCount + " total");
+    Log.d(TAG, "Positive words matched: " + positiveMatches.size() + "\nNegative words matched: " + negativeMatches.size()
+        + "\nof " + totalWordCount + " total");
     Log.d(TAG, "Time to process: " + timeTaken + "ms");
+
+    String positiveMatchesString = "";
+    String negativeMatchesString = "";
+
+    for (String s : positiveMatches) positiveMatchesString += s + "; ";
+    for (String s : negativeMatches) negativeMatchesString += s + "; ";
+
+    Log.d(TAG, "Positive: " + positiveMatchesString);
+    Log.d(TAG, "Negative: " + negativeMatchesString);
   }
 
-  @Nullable
-  @Override
-  public IBinder onBind(Intent intent) {
-    return null;
-  }
-
-  @Override
-  public void onDestroy() {
-    super.onDestroy();
-  }
-
-  private List<SMSModel> getSentMessages() {
+  private static List<SMSModel> getSentMessages(Context context) {
     List<SMSModel> sentSMS = new ArrayList<>();
-    ContentResolver cr = this.getContentResolver();
+    ContentResolver cr = context.getContentResolver();
 
     Cursor c = cr.query(Telephony.Sms.Sent.CONTENT_URI,
-        new String[] { Telephony.Sms.Sent.BODY, Telephony.Sms.Sent.DATE },
+        new String[]{Telephony.Sms.Sent.BODY, Telephony.Sms.Sent.DATE},
         null,
         null,
         Telephony.Sms.Sent.DATE);
@@ -96,5 +94,16 @@ public class TextMessageService extends Service {
     c.close();
 
     return sentSMS;
+  }
+
+  @Override
+  public void onCreate() {
+    getSentimentAnalysis(this);
+  }
+
+  @Nullable
+  @Override
+  public IBinder onBind(Intent intent) {
+    return null;
   }
 }
