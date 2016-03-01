@@ -8,6 +8,12 @@ import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.location.places.PlaceLikelihood;
+import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
+import com.google.android.gms.location.places.Places;
 import com.tomrichardson.datacollection.model.LocationModel;
 
 import java.io.IOException;
@@ -24,16 +30,18 @@ public class LocationListener implements android.location.LocationListener {
   private Location mLastLocation;
   private Geocoder mGeoCoder;
   private Context mContext;
+  private GoogleApiClient mGoogleApiClient;
 
-  public LocationListener(String provider, Context context) {
+  public LocationListener(String provider, Context context, GoogleApiClient googleApiClient) {
     Log.e(TAG, "LocationListener " + provider);
     mLastLocation = new Location(provider);
     mGeoCoder = new Geocoder(context);
     mContext = context;
+    mGoogleApiClient = googleApiClient;
   }
 
   @Override
-  public void onLocationChanged(Location location) {
+  public void onLocationChanged(final Location location) {
     Log.e(TAG, "onLocationChanged: " + location);
     mLastLocation.set(location);
 
@@ -47,16 +55,51 @@ public class LocationListener implements android.location.LocationListener {
 
     Log.d("LOCATION", "Address: " + address.getAddressLine(0));
 
+    final Address finalAddress = address;
 
-    LocationModel l = new LocationModel(location.getProvider(), location.getLatitude(), location.getLongitude(), location.getAltitude(),
-        location.getAccuracy(), Calendar.getInstance().getTime(),
-        address.getAddressLine(0), address.getPostalCode(), address.getLocality(), address.getCountryName());
+    // Now we try to get a 'place' for the location
+    if(mGoogleApiClient.isConnected()) {
+      PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi
+          .getCurrentPlace(mGoogleApiClient, null);
 
+      result.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>() {
+        @Override
+        public void onResult(PlaceLikelihoodBuffer likelyPlaces) {
+          PlaceLikelihood mostLikely = null;
+          for (PlaceLikelihood placeLikelihood : likelyPlaces) {
+            Log.d(TAG, String.format("Place '%s' has likelihood: %g",
+                placeLikelihood.getPlace().getName(),
+                placeLikelihood.getLikelihood()));
 
+            if(mostLikely == null || placeLikelihood.getLikelihood() > mostLikely.getLikelihood()) {
+              mostLikely = placeLikelihood;
+            }
+          }
+
+          String placeName = mostLikely == null ? null : mostLikely.getPlace().getName().toString();
+          likelyPlaces.release();
+
+          LocationModel l = new LocationModel(placeName, location.getProvider(), location.getLatitude(), location.getLongitude(), location.getAltitude(),
+              location.getAccuracy(), Calendar.getInstance().getTime(),
+              finalAddress.getAddressLine(0), finalAddress.getPostalCode(), finalAddress.getLocality(), finalAddress.getCountryName());
+
+          saveLocation(l);
+        }
+      });
+    } else {
+      LocationModel l = new LocationModel(null, location.getProvider(), location.getLatitude(), location.getLongitude(), location.getAltitude(),
+          location.getAccuracy(), Calendar.getInstance().getTime(),
+          finalAddress.getAddressLine(0), finalAddress.getPostalCode(), finalAddress.getLocality(), finalAddress.getCountryName());
+
+      saveLocation(l);
+    }
+  }
+
+  private void saveLocation(LocationModel l) {
     RushCore.getInstance().save(l);
+
     Log.d("BROADCAST", LocationModel.class.toString());
     mContext.sendBroadcast(new Intent(LocationModel.class.toString()));
-
   }
 
   @Override

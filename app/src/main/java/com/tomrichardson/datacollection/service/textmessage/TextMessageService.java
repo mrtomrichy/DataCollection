@@ -1,17 +1,15 @@
 package com.tomrichardson.datacollection.service.textmessage;
 
-import android.app.Service;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
-import android.os.IBinder;
 import android.provider.Telephony;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.tomrichardson.datacollection.R;
+import com.tomrichardson.datacollection.Utils;
 import com.tomrichardson.datacollection.model.SMSModel;
+import com.tomrichardson.datacollection.model.summary.TextSummary;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,11 +19,11 @@ import java.util.List;
 /**
  * Created by tom on 14/12/2015.
  */
-public class TextMessageService extends Service {
+public class TextMessageService {
 
   private static final String TAG = "SMSService";
 
-  public static void getSentimentAnalysis(Context context) {
+  public static TextSummary getSentimentAnalysis(Context context, Date date) {
     long startTime = System.currentTimeMillis();
 
     String[] positiveWords = context.getResources().getStringArray(R.array.positive_words);
@@ -37,7 +35,7 @@ public class TextMessageService extends Service {
     for (String word : positiveWords) positiveMap.put(word, 0);
     for (String word : negativeWords) negativeMap.put(word, 0);
 
-    List<SMSModel> sentSMS = getSentMessages(context);
+    List<SMSModel> sentSMS = getSentMessages(context, date);
 
     Log.d(TAG, "SMS count: " + sentSMS.size());
     int totalWordCount = 0;
@@ -68,16 +66,19 @@ public class TextMessageService extends Service {
 
     Log.d(TAG, "Positive: " + positiveMatchesString);
     Log.d(TAG, "Negative: " + negativeMatchesString);
+
+    return new TextSummary(totalWordCount, negativeMatches.size(), positiveMatches.size());
   }
 
-  private static List<SMSModel> getSentMessages(Context context) {
+  private static List<SMSModel> getSentMessages(Context context, Date day) {
     List<SMSModel> sentSMS = new ArrayList<>();
     ContentResolver cr = context.getContentResolver();
 
+
     Cursor c = cr.query(Telephony.Sms.Sent.CONTENT_URI,
         new String[]{Telephony.Sms.Sent.BODY, Telephony.Sms.Sent.DATE},
-        null,
-        null,
+        Telephony.Sms.Sent.DATE + ">? AND " + Telephony.Sms.Sent.DATE + "<?",
+        new String[]{day.getTime() + "", (day.getTime() + Utils.DAY_LENGTH_MS) + ""},
         Telephony.Sms.Sent.DATE);
 
     int totalSMS = c.getCount();
@@ -94,16 +95,5 @@ public class TextMessageService extends Service {
     c.close();
 
     return sentSMS;
-  }
-
-  @Override
-  public void onCreate() {
-    getSentimentAnalysis(this);
-  }
-
-  @Nullable
-  @Override
-  public IBinder onBind(Intent intent) {
-    return null;
   }
 }

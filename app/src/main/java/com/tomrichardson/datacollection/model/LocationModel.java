@@ -8,6 +8,7 @@ import co.uk.rushorm.core.RushObject;
  * Created by tom on 20/11/2015.
  */
 public class LocationModel extends RushObject {
+  public String placeName;
   public double latitude;
   public double longitude;
   public double altitude;
@@ -22,8 +23,9 @@ public class LocationModel extends RushObject {
   // Default constructor needed for Rush
   public LocationModel() {}
 
-  public LocationModel(String provider, double latitude, double longitude, double altitude, float accuracy, Date date,
+  public LocationModel(String placeName, String provider, double latitude, double longitude, double altitude, float accuracy, Date date,
                         String address, String zipCode, String city, String country) {
+    this.placeName = placeName;
     this.provider = provider;
     this.latitude = latitude;
     this.altitude = altitude;

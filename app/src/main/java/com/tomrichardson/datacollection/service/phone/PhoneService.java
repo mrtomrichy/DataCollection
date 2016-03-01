@@ -1,26 +1,24 @@
 package com.tomrichardson.datacollection.service.phone;
 
-import android.app.Service;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
-import android.os.IBinder;
 import android.provider.CallLog;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.tomrichardson.datacollection.Utils;
 import com.tomrichardson.datacollection.model.PhoneCallModel;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
-public class PhoneService extends Service {
+public class PhoneService {
 
   private static final String TAG = "PhoneService";
 
-  public static void getPhoneCallData(Context context) {
+  public static List<PhoneCallModel> getPhoneCallData(Context context, Date today) {
     List<PhoneCallModel> calls = new ArrayList<>();
 
     ContentResolver cr = context.getContentResolver();
@@ -43,19 +41,14 @@ public class PhoneService extends Service {
 
     Log.d(TAG, calls.size() + "");
 
-    for (PhoneCallModel call : calls) {
-      Log.d(TAG, "Phone Number:--- " + call.number + " \nCall Type:--- " + call.getCallType() + " \nCall Date:--- " + call.time + " \nCall duration in sec :--- " + call.duration);
+    Iterator<PhoneCallModel> it = calls.iterator();
+
+    while(it.hasNext()) {
+      PhoneCallModel call = it.next();
+      if(!Utils.isSameDay(call.time, today))
+        it.remove();
     }
-  }
 
-  @Override
-  public void onCreate() {
-    getPhoneCallData(this);
-  }
-
-  @Nullable
-  @Override
-  public IBinder onBind(Intent intent) {
-    return null;
+    return calls;
   }
 }

@@ -9,7 +9,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 
 import com.tomrichardson.datacollection.R;
-import com.tomrichardson.datacollection.model.service.DataServiceModel;
+import com.tomrichardson.datacollection.model.service.RunnableService;
+import com.tomrichardson.datacollection.model.service.RunnableServiceModel;
 import com.tomrichardson.datacollection.ui.adapter.DataServiceAdapter;
 
 public class MainActivity extends AppCompatActivity {
@@ -32,10 +33,10 @@ public class MainActivity extends AppCompatActivity {
 
     adapter = new DataServiceAdapter(this, new DataServiceAdapter.RowClickedListener() {
       @Override
-      public void rowClicked(DataServiceModel service) {
-        if(service.getModelClass() != null){
+      public void rowClicked(RunnableService service) {
+        if (service instanceof RunnableServiceModel) {
           Intent i = new Intent(MainActivity.this, DataViewActivity.class);
-          i.putExtra(DataViewActivity.TRACKING_SERVICE_KEY, service);
+          i.putExtra(DataViewActivity.TRACKING_SERVICE_KEY, (RunnableServiceModel) service);
           startActivity(i);
         }
       }
@@ -46,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
   @Override
   public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
     adapter.onPermissionUpdate(grantResults.length > 0
-                              && grantResults[0] == PackageManager.PERMISSION_GRANTED,
-                              requestCode);
+            && grantResults[0] == PackageManager.PERMISSION_GRANTED,
+        requestCode);
   }
 }

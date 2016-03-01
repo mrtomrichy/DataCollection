@@ -7,11 +7,15 @@ import android.content.Context;
 import com.tomrichardson.datacollection.model.ActivityModel;
 import com.tomrichardson.datacollection.model.LocationModel;
 import com.tomrichardson.datacollection.model.ScreenStateModel;
-import com.tomrichardson.datacollection.model.service.DataServiceModel;
+import com.tomrichardson.datacollection.model.SummaryModel;
+import com.tomrichardson.datacollection.model.service.RunnableService;
+import com.tomrichardson.datacollection.model.service.RunnableServiceModel;
+import com.tomrichardson.datacollection.model.service.StaticServiceModel;
 import com.tomrichardson.datacollection.service.activity.ActivityService;
 import com.tomrichardson.datacollection.service.location.LocationService;
 import com.tomrichardson.datacollection.service.phone.PhoneService;
 import com.tomrichardson.datacollection.service.phonestate.ScreenStateService;
+import com.tomrichardson.datacollection.service.summary.SummaryService;
 import com.tomrichardson.datacollection.service.textmessage.TextMessageService;
 
 /**
@@ -29,26 +33,27 @@ public class ServiceUtils {
     return false;
   }
 
-  public static DataServiceModel[] getSupportedDataServices(Context context) {
+  public static RunnableService[] getSupportedDataServices(Context context) {
 
-    return new DataServiceModel[]{
-        new DataServiceModel("Location Service", LocationService.class,
+    return new RunnableService[]{
+        new RunnableServiceModel("Location Service", LocationService.class,
                             new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
-                            LocationModel.class, context),
-        new DataServiceModel("Activity Service", ActivityService.class,
+                            LocationModel.class),
+        new RunnableServiceModel("Activity Service", ActivityService.class,
                             new String[]{},
-                            ActivityModel.class, context),
-        new DataServiceModel("Text Message Service", TextMessageService.class,
-            new String[]{Manifest.permission.READ_SMS},
-            null, context),
+                            ActivityModel.class),
+        new StaticServiceModel("Text Message Service", TextMessageService.class,
+            new String[]{Manifest.permission.READ_SMS}),
 
-        new DataServiceModel("Phone Service", PhoneService.class,
-            new String[]{Manifest.permission.READ_CALL_LOG},
-            null, context),
+        new StaticServiceModel("Phone Service", PhoneService.class,
+            new String[]{Manifest.permission.READ_CALL_LOG}),
 
-        new DataServiceModel("Phone State Service", ScreenStateService.class,
+        new RunnableServiceModel("Screen State Service", ScreenStateService.class,
             new String[]{},
-            ScreenStateModel.class, context)
+            ScreenStateModel.class),
+
+        new RunnableServiceModel("Summary Service", SummaryService.class,
+            new String[]{}, SummaryModel.class)
     };
   }
 }

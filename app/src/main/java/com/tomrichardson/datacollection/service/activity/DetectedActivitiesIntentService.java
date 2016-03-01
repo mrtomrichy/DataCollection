@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
+import com.tomrichardson.datacollection.Utils;
 import com.tomrichardson.datacollection.model.ActivityModel;
 
 import java.util.ArrayList;
@@ -55,8 +56,7 @@ public class DetectedActivitiesIntentService extends IntentService {
     }
 
     if (activity != null) {
-      RushCore.getInstance().save(new ActivityModel(activity.getType(), System.currentTimeMillis(),
-          getActivityString(activity.getType())));
+      new ActivityModel(activity.getType(), System.currentTimeMillis(), Utils.getActivityString(activity.getType())).save();
 
       normaliseActivities();
 
@@ -83,28 +83,7 @@ public class DetectedActivitiesIntentService extends IntentService {
     }
   }
 
-  private static String getActivityString(int detectedActivityType) {
-    switch (detectedActivityType) {
-      case DetectedActivity.IN_VEHICLE:
-        return "VEHICLE";
-      case DetectedActivity.ON_BICYCLE:
-        return "BICYCLE";
-      case DetectedActivity.ON_FOOT:
-        return "FOOT";
-      case DetectedActivity.RUNNING:
-        return "RUNNING";
-      case DetectedActivity.STILL:
-        return "STILL";
-      case DetectedActivity.TILTING:
-        return "TILTING";
-      case DetectedActivity.UNKNOWN:
-        return "UNKNOWN";
-      case DetectedActivity.WALKING:
-        return "WALKING";
-      default:
-        return "UNIDENTIFIABLE";
-    }
-  }
+
 
   private boolean isActivityRelevant(int id) {
     return importantActivities.indexOf(id) != -1;

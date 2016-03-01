@@ -20,7 +20,16 @@ public class ScreenStateService extends Service {
     public void onReceive(Context context, Intent intent) {
       Log.d(TAG, "Screen on");
 
+//      if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+//        NotificationManager nm = getSystemService(NotificationManager.class);
+//
+//        StatusBarNotification[] notifications = nm.getActiveNotifications();
+//
+//        if(notifications.length > 0) Log.d(TAG, "There are active notifications");
+//      }
+
       new ScreenStateModel(System.currentTimeMillis(), ScreenStateModel.SCREEN_ON).save();
+      context.sendBroadcast(new Intent(ScreenStateModel.class.getName()));
     }
   };
 
@@ -30,6 +39,7 @@ public class ScreenStateService extends Service {
       Log.d(TAG, "Screen off");
 
       new ScreenStateModel(System.currentTimeMillis(), ScreenStateModel.SCREEN_OFF).save();
+      context.sendBroadcast(new Intent(ScreenStateModel.class.getName()));
     }
   };
 
@@ -47,6 +57,7 @@ public class ScreenStateService extends Service {
 
     unregisterReceiver(screenOnReceiver);
     unregisterReceiver(screenOffReceiver);
+
   }
 
   @Nullable

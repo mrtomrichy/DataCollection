@@ -44,16 +44,33 @@ public class DataViewAdapter extends RecyclerView.Adapter<DataViewAdapter.ViewHo
 
     for(Field f : fields) {
       try {
-        outputString += "<b>" + f.getName() + ":</b> " + f.get(object);
+        outputString += "<b>" + f.getName() + ":</b> " + getObjectOutput(f.get(object));
         if(fields.indexOf(f) < fields.size()-1) {
           outputString += "<br/>";
         }
       } catch(IllegalAccessException ex) {
-
+        ex.printStackTrace();
       }
     }
 
     holder.dataOutput.setText(Html.fromHtml(outputString));
+  }
+
+  private String getObjectOutput(Object o) {
+    String output;
+    if(o instanceof List) {
+      List l = (List) o;
+      output = "[";
+      for(Object obj : l) {
+        output += getObjectOutput(obj) + ", ";
+      }
+      output = output.substring(0, output.length() - 2);
+      output += "]";
+    } else {
+      output = o == null ? "null" : o.toString();
+    }
+
+    return output;
   }
 
   @Override

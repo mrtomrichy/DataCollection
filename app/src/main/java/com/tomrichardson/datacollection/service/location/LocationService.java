@@ -4,19 +4,28 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.location.LocationManager;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
-public class LocationService extends Service {
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.Places;
+
+public class LocationService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<Status> {
   public LocationService() {
   }
 
   private static final String TAG = "LOCATIONSERVICE";
   private LocationManager mLocationManager = null;
-  private static final int LOCATION_INTERVAL = 10 * 60 * 1000;
+  private static final int LOCATION_INTERVAL = 2 * 60 * 1000;
   private static final float LOCATION_DISTANCE = 10f;
 
   private LocationListener[] mLocationListeners;
+
+  private GoogleApiClient mGoogleApiClient;
 
   @Override
   public IBinder onBind(Intent arg0) {
@@ -34,9 +43,17 @@ public class LocationService extends Service {
   public void onCreate() {
     Log.e(TAG, "onCreate");
 
+    mGoogleApiClient = new GoogleApiClient.Builder(this)
+        .addApi(Places.PLACE_DETECTION_API)
+        .addConnectionCallbacks(this)
+        .addOnConnectionFailedListener(this)
+        .build();
+
+    mGoogleApiClient.connect();
+
     mLocationListeners = new LocationListener[]{
-        new LocationListener(LocationManager.GPS_PROVIDER, getApplicationContext()),
-        new LocationListener(LocationManager.NETWORK_PROVIDER, getApplicationContext())
+        new LocationListener(LocationManager.GPS_PROVIDER, getApplicationContext(), mGoogleApiClient),
+        new LocationListener(LocationManager.NETWORK_PROVIDER, getApplicationContext(), mGoogleApiClient)
     };
 
     initializeLocationManager();
@@ -49,6 +66,7 @@ public class LocationService extends Service {
     } catch (IllegalArgumentException ex) {
       Log.d(TAG, "network provider does not exist, " + ex.getMessage());
     }
+
     try {
       mLocationManager.requestLocationUpdates(
           LocationManager.GPS_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,
@@ -74,6 +92,8 @@ public class LocationService extends Service {
         }
       }
     }
+
+    mGoogleApiClient.disconnect();
   }
 
   private void initializeLocationManager() {
@@ -81,5 +101,21 @@ public class LocationService extends Service {
     if (mLocationManager == null) {
       mLocationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
     }
+  }
+
+  @Override
+  public void onConnected(Bundle bundle) {
+  }
+
+  @Override
+  public void onConnectionSuspended(int i) {
+  }
+
+  @Override
+  public void onConnectionFailed(ConnectionResult connectionResult) {
+  }
+
+  @Override
+  public void onResult(Status status) {
   }
 }

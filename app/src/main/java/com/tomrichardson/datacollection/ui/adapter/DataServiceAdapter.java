@@ -13,7 +13,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.tomrichardson.datacollection.R;
-import com.tomrichardson.datacollection.model.service.DataServiceModel;
+import com.tomrichardson.datacollection.model.service.RunnableService;
 import com.tomrichardson.datacollection.service.ServiceUtils;
 
 import java.util.Arrays;
@@ -25,11 +25,11 @@ import java.util.List;
 public class DataServiceAdapter extends RecyclerView.Adapter<DataServiceAdapter.ViewHolder> {
 
   public interface RowClickedListener {
-    void rowClicked(DataServiceModel service);
+    void rowClicked(RunnableService service);
   }
 
   private Activity activity;
-  private List<DataServiceModel> services;
+  private List<RunnableService> services;
   private RowClickedListener listener;
 
   public DataServiceAdapter(Activity activity, RowClickedListener listener) {
@@ -55,7 +55,7 @@ public class DataServiceAdapter extends RecyclerView.Adapter<DataServiceAdapter.
 
   @Override
   public void onBindViewHolder(ViewHolder holder, int position) {
-    final DataServiceModel service = services.get(position);
+    final RunnableService service = services.get(position);
 
     holder.itemView.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -67,7 +67,7 @@ public class DataServiceAdapter extends RecyclerView.Adapter<DataServiceAdapter.
     });
 
     holder.name.setText(service.getName());
-    holder.toggle.setChecked(service.isServiceRunning());
+    holder.toggle.setChecked(service.isRunning(activity));
     holder.toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
       @Override
       public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -85,13 +85,13 @@ public class DataServiceAdapter extends RecyclerView.Adapter<DataServiceAdapter.
     return services.size();
   }
 
-  private void stopService(DataServiceModel service) {
-    service.stopService(activity);
+  private void stopService(RunnableService service) {
+    service.disable(activity);
   }
 
-  private void startService(DataServiceModel service) {
+  private void startService(RunnableService service) {
 
-    for (String permission : service.getRequiredPermissions()) {
+    for (String permission : service.getPermissions()) {
       if (ContextCompat.checkSelfPermission(activity, permission) != PackageManager.PERMISSION_GRANTED) {
         ActivityCompat.requestPermissions(activity,
             new String[]{permission},
@@ -101,7 +101,7 @@ public class DataServiceAdapter extends RecyclerView.Adapter<DataServiceAdapter.
       }
     }
 
-    service.startService(activity);
+    service.enable(activity);
   }
 
   public static class ViewHolder extends RecyclerView.ViewHolder {

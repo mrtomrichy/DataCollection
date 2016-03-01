@@ -9,12 +9,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.tomrichardson.datacollection.R;
-import com.tomrichardson.datacollection.model.service.DataServiceModel;
+import com.tomrichardson.datacollection.model.service.RunnableServiceModel;
 import com.tomrichardson.datacollection.ui.adapter.DataViewAdapter;
 
 import java.lang.reflect.Field;
@@ -30,7 +31,7 @@ public class DataViewActivity extends AppCompatActivity {
 
   public static final String TRACKING_SERVICE_KEY = "tracking_service";
 
-  private DataServiceModel service;
+  private RunnableServiceModel service;
   private DataViewAdapter adapter;
   private List<RushObject> models;
 
