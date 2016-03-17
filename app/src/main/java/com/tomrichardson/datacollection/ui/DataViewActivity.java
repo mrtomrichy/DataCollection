@@ -9,13 +9,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.tomrichardson.datacollection.R;
-import com.tomrichardson.datacollection.model.service.RunnableServiceModel;
 import com.tomrichardson.datacollection.ui.adapter.DataViewAdapter;
 
 import java.lang.reflect.Field;
@@ -31,11 +29,11 @@ public class DataViewActivity extends AppCompatActivity {
 
   public static final String TRACKING_SERVICE_KEY = "tracking_service";
 
-  private RunnableServiceModel service;
+  private Class service;
   private DataViewAdapter adapter;
   private List<RushObject> models;
 
-  BroadcastReceiver receiver = new BroadcastReceiver() {
+  private BroadcastReceiver receiver = new BroadcastReceiver() {
     @Override
     public void onReceive(Context context, Intent intent) {
       updateItems();
@@ -54,17 +52,17 @@ public class DataViewActivity extends AppCompatActivity {
 
     Bundle extras = getIntent().getExtras();
     if(extras != null && extras.containsKey(TRACKING_SERVICE_KEY)) {
-      service = extras.getParcelable(TRACKING_SERVICE_KEY);
+      service = (Class) extras.getSerializable(TRACKING_SERVICE_KEY);
     } else {
       finish();
     }
 
-    getSupportActionBar().setTitle(service.getName() + " data");
+    getSupportActionBar().setTitle(service.getSimpleName() + " data");
 
-    models = new RushSearch().orderAsc("rush_created").find(service.getModelClass());
+    models = new RushSearch().orderAsc("rush_created").find(service);
 
     List<Field> fields = new ArrayList<>();
-    ReflectionUtils.getAllFields(fields, service.getModelClass(), true);
+    ReflectionUtils.getAllFields(fields, service, true);
 
     RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.dataviewlist);
     mRecyclerView.setHasFixedSize(true);
@@ -78,12 +76,12 @@ public class DataViewActivity extends AppCompatActivity {
 
   private void updateItems() {
     models.clear();
-    models.addAll(new RushSearch().find(service.getModelClass()));
+    models.addAll(new RushSearch().find(service));
     adapter.notifyDataSetChanged();
   }
 
   private void deleteAll() {
-    RushCore.getInstance().delete(new RushSearch().find(service.getModelClass()));
+    RushCore.getInstance().delete(new RushSearch().find(service));
     updateItems();
   }
 
@@ -109,7 +107,7 @@ public class DataViewActivity extends AppCompatActivity {
   protected void onResume() {
     super.onResume();
 
-    registerReceiver(receiver, new IntentFilter(service.getModelClass().toString()));
+    registerReceiver(receiver, new IntentFilter(service.toString()));
     updateItems();
   }
 

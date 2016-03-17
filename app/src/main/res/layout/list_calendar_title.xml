@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<TextView
+    android:id="@+id/title_textview"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="40dp"
+    android:layout_height="30dp"
+    android:fontFamily="sans-serif-condensed"
+    android:gravity="center_horizontal"
+    android:padding="8dp"
+    android:text="Mon"
+    android:textAppearance="?android:attr/textAppearanceSmall"
+    android:textSize="13sp"/>

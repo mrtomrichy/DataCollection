@@ -1,11 +1,8 @@
 package com.tomrichardson.datacollection.service.activity;
 
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -13,18 +10,17 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.ActivityRecognition;
+import com.tomrichardson.datacollection.service.RushWaitService;
 
 /**
  * Created by tom on 06/12/2015.
  */
-public class ActivityService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<Status> {
+public class ActivityService extends RushWaitService implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<Status> {
 
   private GoogleApiClient mGoogleApiClient;
 
   @Override
-  public void onCreate() {
-    super.onCreate();
-
+  public void run() {
     mGoogleApiClient = new GoogleApiClient.Builder(this)
         .addApi(ActivityRecognition.API)
         .addConnectionCallbacks(this)
@@ -39,12 +35,6 @@ public class ActivityService extends Service implements GoogleApiClient.Connecti
     super.onDestroy();
     ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(mGoogleApiClient, getActivityDetectionPendingIntent());
     mGoogleApiClient.disconnect();
-  }
-
-  @Nullable
-  @Override
-  public IBinder onBind(Intent intent) {
-    return null;
   }
 
   @Override

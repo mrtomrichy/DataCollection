@@ -1,55 +1,55 @@
 package com.tomrichardson.datacollection.service.summary;
 
-import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
-import android.os.IBinder;
-import android.support.annotation.Nullable;
 import android.util.Log;
+import android.util.Pair;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.tomrichardson.datacollection.Utils;
 import com.tomrichardson.datacollection.model.ActivityModel;
 import com.tomrichardson.datacollection.model.LocationModel;
 import com.tomrichardson.datacollection.model.PhoneCallModel;
 import com.tomrichardson.datacollection.model.SummaryModel;
+import com.tomrichardson.datacollection.model.service.RunnableService;
 import com.tomrichardson.datacollection.model.summary.ActivitySummary;
 import com.tomrichardson.datacollection.model.summary.CallSummary;
 import com.tomrichardson.datacollection.model.summary.LocationSummary;
 import com.tomrichardson.datacollection.model.summary.TextSummary;
+import com.tomrichardson.datacollection.service.Services;
+import com.tomrichardson.datacollection.service.activity.ActivityService;
+import com.tomrichardson.datacollection.service.location.LocationService;
 import com.tomrichardson.datacollection.service.phone.PhoneService;
 import com.tomrichardson.datacollection.service.textmessage.TextMessageService;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 import co.uk.rushorm.core.RushSearch;
 
 /**
  * Created by tom on 07/02/2016.
  */
-public class SummaryService extends Service {
+public class SummaryService {
 
   private static final String TAG = "SummaryService";
 
-  private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault());
-
-  @Override
-  public void onCreate() {
+  public static void summarise(Context context) {
     Date today = Utils.getTodayDate();
 
-    List<LocationSummary> locations = summariseLocations(today);
-    CallSummary callSummary = summarisePhoneData(today);
-    TextSummary textSummary = summariseSentiment(today);
-    List<ActivitySummary> activities = summariseActivities(today);
 
-    String date = dateFormat.format(today.getTime());
+    List<LocationSummary> locations = isServiceEnabled(LocationService.class, context) ? summariseLocations(today) : null;
+    CallSummary callSummary = isServiceEnabled(PhoneService.class, context) ? summarisePhoneData(today, context) : null;
+    TextSummary textSummary = isServiceEnabled(TextMessageService.class, context) ? summariseSentiment(today, context) : null;
+    List<ActivitySummary> activities = isServiceEnabled(ActivityService.class, context) ? summariseActivities(today) : null;
+
+    String date = SummaryModel.getDateString(today);
     SummaryModel model = new RushSearch().whereEqual("date", date).findSingle(SummaryModel.class);
     if (model == null) {
-      model = new SummaryModel(dateFormat.format(today.getTime()), locations, activities, callSummary, textSummary);
+      model = new SummaryModel(SummaryModel.getDateString(today), locations, activities, callSummary, textSummary);
     } else {
       if (model.locations != null) {
         for (LocationSummary location : model.locations) {
@@ -78,9 +78,20 @@ public class SummaryService extends Service {
     }
 
     model.save();
+    context.sendBroadcast(new Intent(SummaryModel.class.getName()));
   }
 
-  private List<LocationSummary> summariseLocations(Date today) {
+  private static boolean isServiceEnabled(Class serviceClass, Context context) {
+    for(RunnableService service : Services.getInstance().getSupportedDataServices()) {
+      if(serviceClass.equals(service.getServiceClass())) {
+        return service.isRunning(context);
+      }
+    }
+
+    return false;
+  }
+
+  private static List<LocationSummary> summariseLocations(Date today) {
     List<LocationModel> locations = new RushSearch().whereGreaterThan("date", today.getTime())
         .and().whereLessThan("date", today.getTime() + Utils.DAY_LENGTH_MS)
         .orderAsc("date")
@@ -88,27 +99,27 @@ public class SummaryService extends Service {
 
     Log.d(TAG, locations.size() + " locations found today");
 
-    HashMap<String, Integer> locationFrequency = new HashMap<>();
+    HashMap<String, Pair<Integer, LatLng>> locationFrequency = new HashMap<>();
 
     for (LocationModel location : locations) {
       if (locationFrequency.containsKey(location.placeName)) {
-        locationFrequency.put(location.placeName, locationFrequency.get(location.placeName) + 1);
+        locationFrequency.put(location.placeName, new Pair<>(locationFrequency.get(location.placeName).first + 1, locationFrequency.get(location.placeName).second));
       } else {
-        locationFrequency.put(location.placeName, 1);
+        locationFrequency.put(location.placeName, new Pair<>(1, new LatLng(location.latitude, location.longitude)));
       }
     }
 
     List<LocationSummary> frequencies = new ArrayList<>();
 
     for (String key : locationFrequency.keySet()) {
-      frequencies.add(new LocationSummary(key, locationFrequency.get(key)));
+      frequencies.add(new LocationSummary(key, locationFrequency.get(key).first.intValue(), locationFrequency.get(key).second.latitude, locationFrequency.get(key).second.longitude));
     }
 
     Collections.sort(frequencies);
     return frequencies;
   }
 
-  private List<ActivitySummary> summariseActivities(Date today) {
+  private static List<ActivitySummary> summariseActivities(Date today) {
     List<ActivityModel> activities = new RushSearch().whereGreaterThan("time", today.getTime())
         .and().whereLessThan("time", today.getTime() + Utils.DAY_LENGTH_MS)
         .orderAsc("time")
@@ -137,8 +148,8 @@ public class SummaryService extends Service {
     return summary;
   }
 
-  private CallSummary summarisePhoneData(Date today) {
-    List<PhoneCallModel> calls = PhoneService.getPhoneCallData(this, today);
+  private static CallSummary summarisePhoneData(Date today, Context context) {
+    List<PhoneCallModel> calls = PhoneService.getPhoneCallData(context, today);
 
     int callCount = calls.size();
     String mostCalled = null;
@@ -172,17 +183,11 @@ public class SummaryService extends Service {
     return new CallSummary(callCount, mostCalled, timeSpentStr);
   }
 
-  private TextSummary summariseSentiment(Date today) {
-    return TextMessageService.getSentimentAnalysis(this, today);
+  private static TextSummary summariseSentiment(Date today, Context context) {
+    return TextMessageService.getSentimentAnalysis(context, today);
   }
 
-  private void summarisePhoneState() {
+  private static void summarisePhoneState() {
 
-  }
-
-  @Nullable
-  @Override
-  public IBinder onBind(Intent intent) {
-    return null;
   }
 }

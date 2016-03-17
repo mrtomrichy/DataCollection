@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<TextView
+    android:id="@+id/day_textview"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="40dp"
+    android:layout_height="40dp"
+    android:fontFamily="sans-serif-light"
+    android:gravity="center_horizontal"
+    android:padding="8dp"
+    android:text="1"
+    android:textAppearance="?android:attr/textAppearanceSmall"
+    android:textSize="18sp"/>

@@ -14,9 +14,7 @@ import android.widget.TextView;
 
 import com.tomrichardson.datacollection.R;
 import com.tomrichardson.datacollection.model.service.RunnableService;
-import com.tomrichardson.datacollection.service.ServiceUtils;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -32,9 +30,9 @@ public class DataServiceAdapter extends RecyclerView.Adapter<DataServiceAdapter.
   private List<RunnableService> services;
   private RowClickedListener listener;
 
-  public DataServiceAdapter(Activity activity, RowClickedListener listener) {
+  public DataServiceAdapter(Activity activity, List<RunnableService> services, RowClickedListener listener) {
     this.activity = activity;
-    this.services = Arrays.asList(ServiceUtils.getSupportedDataServices(activity));
+    this.services = services;
     this.listener = listener;
   }
 

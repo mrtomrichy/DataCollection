@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Parcel;
 import android.util.Log;
 
-import com.tomrichardson.datacollection.service.ServiceUtils;
+import com.tomrichardson.datacollection.Utils;
 
 /**
  * Created by tom on 22/11/2015.
@@ -41,7 +41,7 @@ public class RunnableServiceModel extends RunnableService {
 
   @Override
   public boolean isRunning(Context context) {
-    return ServiceUtils.isMyServiceRunning(context, getServiceClass());
+    return Utils.isMyServiceRunning(context, getServiceClass());
   }
 
   /* Parcelable methods */

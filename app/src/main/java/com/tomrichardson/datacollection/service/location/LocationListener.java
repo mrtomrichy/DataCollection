@@ -45,7 +45,7 @@ public class LocationListener implements android.location.LocationListener {
     Log.e(TAG, "onLocationChanged: " + location);
     mLastLocation.set(location);
 
-    Address address = null;
+    Address address;
     try {
       address = mGeoCoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0);
     } catch (IOException e) {

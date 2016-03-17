@@ -1,12 +1,11 @@
 package com.tomrichardson.datacollection;
 
-import android.util.Log;
+import android.content.Intent;
 
 import com.tomrichardson.datacollection.model.ActivityModel;
 import com.tomrichardson.datacollection.model.LocationModel;
 import com.tomrichardson.datacollection.model.ScreenStateModel;
 import com.tomrichardson.datacollection.model.SummaryModel;
-import com.tomrichardson.datacollection.model.service.StaticServiceModel;
 import com.tomrichardson.datacollection.model.summary.ActivitySummary;
 import com.tomrichardson.datacollection.model.summary.CallSummary;
 import com.tomrichardson.datacollection.model.summary.LocationSummary;
@@ -24,6 +23,10 @@ import co.uk.rushorm.core.RushCore;
  * Created by tom on 18/11/2015.
  */
 public class Application extends android.app.Application {
+
+  public static final String RUSH_INIT_COMPLETE = "rush_init_complete";
+  public static boolean RUSH_INITIALISED = false;
+
   @Override
   public void onCreate() {
     super.onCreate();
@@ -37,7 +40,6 @@ public class Application extends android.app.Application {
     classes.add(LocationModel.class);
     classes.add(ActivityModel.class);
     classes.add(ScreenStateModel.class);
-    classes.add(StaticServiceModel.ServiceState.class);
     classes.add(SummaryModel.class);
     classes.add(LocationSummary.class);
     classes.add(CallSummary.class);
@@ -48,7 +50,11 @@ public class Application extends android.app.Application {
     config.setInitializeListener(new InitializeListener() {
       @Override
       public void initialized(boolean b) {
-        Log.d("APP", "Init complete");
+        if (!RUSH_INITIALISED) {
+          sendBroadcast(new Intent(RUSH_INIT_COMPLETE));
+        }
+
+        RUSH_INITIALISED = true;
       }
     });
     RushCore.initialize(config);

@@ -1,17 +1,15 @@
 package com.tomrichardson.datacollection.service.phonestate;
 
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.IBinder;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.tomrichardson.datacollection.model.ScreenStateModel;
+import com.tomrichardson.datacollection.service.RushWaitService;
 
-public class ScreenStateService extends Service {
+public class ScreenStateService extends RushWaitService {
 
   private static final String TAG = "PhoneStateService";
 
@@ -44,9 +42,7 @@ public class ScreenStateService extends Service {
   };
 
   @Override
-  public void onCreate() {
-    super.onCreate();
-
+  public void run() {
     registerReceiver(screenOnReceiver, new IntentFilter(Intent.ACTION_SCREEN_ON));
     registerReceiver(screenOffReceiver, new IntentFilter(Intent.ACTION_SCREEN_OFF));
   }
@@ -58,11 +54,5 @@ public class ScreenStateService extends Service {
     unregisterReceiver(screenOnReceiver);
     unregisterReceiver(screenOffReceiver);
 
-  }
-
-  @Nullable
-  @Override
-  public IBinder onBind(Intent intent) {
-    return null;
   }
 }

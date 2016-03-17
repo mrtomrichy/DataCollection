@@ -1,11 +1,9 @@
 package com.tomrichardson.datacollection.service.location;
 
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -13,8 +11,9 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Places;
+import com.tomrichardson.datacollection.service.RushWaitService;
 
-public class LocationService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<Status> {
+public class LocationService extends RushWaitService implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<Status> {
   public LocationService() {
   }
 
@@ -27,10 +26,6 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
   private GoogleApiClient mGoogleApiClient;
 
-  @Override
-  public IBinder onBind(Intent arg0) {
-    return null;
-  }
 
   @Override
   public int onStartCommand(Intent intent, int flags, int startId) {
@@ -40,9 +35,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
   }
 
   @Override
-  public void onCreate() {
-    Log.e(TAG, "onCreate");
-
+  public void run() {
     mGoogleApiClient = new GoogleApiClient.Builder(this)
         .addApi(Places.PLACE_DETECTION_API)
         .addConnectionCallbacks(this)
