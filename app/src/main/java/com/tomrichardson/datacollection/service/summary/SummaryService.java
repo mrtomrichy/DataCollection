@@ -37,9 +37,7 @@ public class SummaryService {
 
   private static final String TAG = "SummaryService";
 
-  public static void summarise(Context context) {
-    Date today = Utils.getTodayDate();
-
+  public static void summarise(Context context, Date today) {
 
     List<LocationSummary> locations = isServiceEnabled(LocationService.class, context) ? summariseLocations(today) : null;
     CallSummary callSummary = isServiceEnabled(PhoneService.class, context) ? summarisePhoneData(today, context) : null;

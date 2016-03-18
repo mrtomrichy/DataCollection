@@ -58,5 +58,8 @@ public class Application extends android.app.Application {
       }
     });
     RushCore.initialize(config);
+
+    // Make sure summary alarm is set
+    Utils.setRepeatingSummaryAlarm(getApplicationContext());
   }
 }

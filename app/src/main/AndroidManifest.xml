@@ -9,6 +9,8 @@
     <uses-permission android:name="android.permission.READ_CALL_LOG"/>
     <uses-permission android:name="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+
 
     <application
         android:name=".Application"
@@ -19,7 +21,7 @@
         android:theme="@style/AppTheme">
         <meta-data
             android:name="Rush_debug"
-            android:value="true"/>
+            android:value="false"/>
 
         <activity
             android:name=".ui.CalendarActivity"
@@ -84,6 +86,17 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyD9iLGlIrySeRBCCdxzpoLGGn4P-2tKPH4"/>
+
+        <receiver android:name=".service.summary.BootReceiver"
+                  android:enabled="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".service.summary.AlarmReceiver"
+                  android:enabled="true">
+        </receiver>
 
     </application>
 

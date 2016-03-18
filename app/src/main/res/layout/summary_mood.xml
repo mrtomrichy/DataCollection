@@ -1,24 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
-        <com.tomrichardson.datacollection.ui.view.MoodType
-            android:id="@+id/positive_mood"
-            android:layout_width="0dp"
+        <com.tomrichardson.datacollection.ui.view.VerticalTextView
+            android:layout_width="40dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"/>
+            android:fontFamily="sans-serif-light"
+            android:gravity="center|bottom"
+            android:text="Mood"
+            android:textSize="28dp"/>
 
-        <com.tomrichardson.datacollection.ui.view.MoodType
-            android:id="@+id/negative_mood"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.tomrichardson.datacollection.ui.view.MoodType
+                    android:id="@+id/positive_mood"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"/>
+
+                <com.tomrichardson.datacollection.ui.view.MoodType
+                    android:id="@+id/negative_mood"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"/>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:fontFamily="sans-serif-light"
+                android:text="@string/mood_blurb"
+                android:id="@+id/mood_blurb"
+                android:padding="16dp"/>
+
+            <include layout="@layout/view_separator"/>
+        </LinearLayout>
+
     </LinearLayout>
 
-    <include layout="@layout/view_separator" />
 </LinearLayout>

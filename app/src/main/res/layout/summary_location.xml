@@ -4,28 +4,42 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="horizontal">
 
-    <fragment
-        android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="140dp"
-        tools:context=".ui.DaySummaryActivity"/>
-
-    <TextView
-        android:id="@+id/place_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/map"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"
-        android:padding="16dp"
-        android:textSize="24sp"
-        tools:text="University Of Manchester"
+    <com.tomrichardson.datacollection.ui.view.VerticalTextView
+        android:layout_width="40dp"
+        android:layout_height="match_parent"
+        android:gravity="center|bottom"
+        android:text="Location"
+        android:textSize="28dp"
         android:fontFamily="sans-serif-light"/>
 
-    <include layout="@layout/view_separator" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="140dp"
+            tools:context=".ui.DaySummaryActivity"
+            android:layout_margin="12dp"/>
+
+        <TextView
+            android:id="@+id/place_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/map"
+            android:layout_centerHorizontal="true"
+            android:fontFamily="sans-serif-light"
+            android:padding="16dp"
+            android:textSize="24sp"
+            tools:text="University Of Manchester"/>
+
+        <include layout="@layout/view_separator"/>
+    </LinearLayout>
 </LinearLayout>

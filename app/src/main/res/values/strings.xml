@@ -6,4 +6,7 @@
     view this data in the calendar above. To turn on tracking please go into the settings menu and select the data sources you would like to keep track of. These can
     be turned off at any time and the app will only summarise data from data sources which are switched on. Your data is not being sent outside of your own phone and the data
         is kept in an secure database on your phone only.</string>
+    <string name="activity_blurb">Above is the time you were active during the day. The app tracks your walking, running, cycling and time spent in a vehicle. The times
+    above are in the format HH:MM.</string>
+    <string name="mood_blurb" formatted="false">Your mood is calculated from the text messages you sent during the day. On this day you sent %s positive words and %s negative words of %s total.</string>
 </resources>

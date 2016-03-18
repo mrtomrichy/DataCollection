@@ -1,9 +1,14 @@
 package com.tomrichardson.datacollection;
 
 import android.app.ActivityManager;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
 
 import com.google.android.gms.location.DetectedActivity;
+import com.tomrichardson.datacollection.service.summary.AlarmReceiver;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -76,5 +81,25 @@ public class Utils {
       default:
         return "UNIDENTIFIABLE";
     }
+  }
+
+  public static void setRepeatingSummaryAlarm(Context appContext) {
+    if (PendingIntent.getBroadcast(appContext, 0, new Intent(appContext, AlarmReceiver.class), PendingIntent.FLAG_NO_CREATE) != null) {
+      return;
+    }
+
+    Calendar calendar = Calendar.getInstance();
+    calendar.setTimeInMillis(System.currentTimeMillis());
+    if(calendar.get(Calendar.HOUR_OF_DAY) >= 1) {
+      calendar.add(Calendar.DAY_OF_MONTH, 1);
+    }
+    calendar.set(Calendar.HOUR_OF_DAY, 1);
+    Intent intent = new Intent(appContext, AlarmReceiver.class);
+    AlarmManager am = (AlarmManager) (appContext.getSystemService(Context.ALARM_SERVICE));
+
+    Log.d("ALARM", "SET ALARM FOR " + calendar.getTime().toString());
+
+    PendingIntent alarmIntent = PendingIntent.getBroadcast(appContext, 0, intent, 0);
+    am.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, alarmIntent);
   }
 }

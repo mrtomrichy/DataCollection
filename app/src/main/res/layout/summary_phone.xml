@@ -4,39 +4,53 @@
               android:layout_height="match_parent"
               android:orientation="horizontal">
 
-    <include
-        layout="@layout/view_icon_text"
-        android:layout_width="0dp"
+    <com.tomrichardson.datacollection.ui.view.VerticalTextView
+        android:layout_width="40dp"
         android:layout_height="match_parent"
-        android:layout_weight="4"/>
+        android:gravity="center|bottom"
+        android:text="Calls"
+        android:textSize="28dp"
+        android:fontFamily="sans-serif-light"/>
 
-    <RelativeLayout
-        android:layout_width="0dp"
-        android:orientation="vertical"
-        android:layout_height="match_parent"
-        android:layout_weight="6">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_centerInParent="true">
-            <TextView
-                android:layout_width="wrap_content"
+        <include
+            layout="@layout/view_icon_text"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="4"/>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="6"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Frequency: 10"
-                android:id="@+id/freq_text"
-                android:textSize="18sp"
-                android:fontFamily="sans-serif-light"/>
+                android:layout_centerInParent="true"
+                android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="No. 07984039091"
-                android:id="@+id/numText"
-                android:textSize="18sp"
-                android:fontFamily="sans-serif-light"/>
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/freq_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-light"
+                    android:text="Frequency: 10"
+                    android:textSize="18sp"/>
 
-    </RelativeLayout>
+                <TextView
+                    android:id="@+id/numText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-light"
+                    android:text="No. 07984039091"
+                    android:textSize="18sp"/>
+            </LinearLayout>
+        </RelativeLayout>
+    </LinearLayout>
 </LinearLayout>

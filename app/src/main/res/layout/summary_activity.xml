@@ -9,30 +9,60 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <com.tomrichardson.datacollection.ui.view.ActivityType
-            android:id="@+id/activity_walking"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"/>
+        <com.tomrichardson.datacollection.ui.view.VerticalTextView
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:fontFamily="sans-serif-light"
+            android:gravity="center|bottom"
+            android:text="Activity"
+            android:textSize="28sp"/>
 
-        <com.tomrichardson.datacollection.ui.view.ActivityType
-            android:id="@+id/activity_running"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"/>
+            android:orientation="vertical">
 
-        <com.tomrichardson.datacollection.ui.view.ActivityType
-            android:id="@+id/activity_vehicle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
-        <com.tomrichardson.datacollection.ui.view.ActivityType
-            android:id="@+id/activity_bicycle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"/>
+                <com.tomrichardson.datacollection.ui.view.ActivityType
+                    android:id="@+id/activity_walking"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"/>
+
+                <com.tomrichardson.datacollection.ui.view.ActivityType
+                    android:id="@+id/activity_running"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"/>
+
+                <com.tomrichardson.datacollection.ui.view.ActivityType
+                    android:id="@+id/activity_vehicle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"/>
+
+                <com.tomrichardson.datacollection.ui.view.ActivityType
+                    android:id="@+id/activity_bicycle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"/>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-light"
+                android:padding="16dp"
+                android:text="@string/activity_blurb"
+                android:textSize="14sp"/>
+
+            <include layout="@layout/view_separator"/>
+        </LinearLayout>
+
     </LinearLayout>
 
-    <include layout="@layout/view_separator"/>
 </LinearLayout>

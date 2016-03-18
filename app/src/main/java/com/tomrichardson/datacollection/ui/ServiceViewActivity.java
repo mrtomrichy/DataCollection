@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.tomrichardson.datacollection.Application;
 import com.tomrichardson.datacollection.R;
+import com.tomrichardson.datacollection.Utils;
 import com.tomrichardson.datacollection.model.SummaryModel;
 import com.tomrichardson.datacollection.model.service.RunnableService;
 import com.tomrichardson.datacollection.model.service.RunnableServiceModel;
@@ -79,7 +80,7 @@ public class ServiceViewActivity extends AppCompatActivity {
       @Override
       public void onClick(View v) {
         if (Application.RUSH_INITIALISED) {
-          SummaryService.summarise(ServiceViewActivity.this);
+          SummaryService.summarise(ServiceViewActivity.this, Utils.getTodayDate());
         }
       }
     });

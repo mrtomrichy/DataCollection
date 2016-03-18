@@ -97,7 +97,7 @@ public class DaySummaryActivity extends AppCompatActivity implements OnMapReadyC
 
     // Mood
     if(summary.textSummary != null) {
-      moodSummary.setData(summary.textSummary.positiveWordCount, summary.textSummary.negativeWordCount);
+      moodSummary.setData(summary.textSummary.positiveWordCount, summary.textSummary.negativeWordCount, summary.textSummary.wordCount);
     } else {
       moodSummary.setVisible(false);
     }
